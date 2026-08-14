@@ -61,7 +61,7 @@ header{position:sticky;top:0;z-index:50;padding:0 0 0;border-bottom:1px solid va
 .tabs button.on{color:#04100e;border-color:var(--aqua);
   background:linear-gradient(180deg,#8ef4e4,#2fe0c8 45%,#12b5a0);
   box-shadow:0 0 14px rgba(47,224,200,.4),inset 0 1px 0 rgba(255,255,255,.5)}
-.views{display:flex;gap:13px;padding:9px 0 8px;align-items:center}
+.views{display:flex;gap:11px;padding:9px 0 8px;align-items:center}
 .views button.v{background:none;border:none;color:var(--dim);font-size:11px;font-weight:700;
   letter-spacing:1.6px;padding:3px 1px 5px;border-bottom:2px solid transparent;text-transform:uppercase}
 .views button.v.on{color:var(--txt);border-color:var(--aqua);text-shadow:0 0 12px rgba(47,224,200,.7)}
@@ -108,6 +108,17 @@ header{position:sticky;top:0;z-index:50;padding:0 0 0;border-bottom:1px solid va
 .set.clash{border-color:var(--mag);box-shadow:0 0 12px rgba(255,46,136,.3),inset 0 0 14px rgba(255,46,136,.12)}
 .set.past{opacity:.4}
 .set.nowplay{border-left-color:#fff;box-shadow:0 0 16px rgba(255,255,255,.25)}
+.set.g0{opacity:.3}
+.set.hascnt{padding-right:26px}
+.set .cnt2{position:absolute;top:3px;right:4px;font-size:8px;font-weight:700;letter-spacing:.2px;
+  color:#04100e;background:var(--aqua);padding:1px 4px;border-radius:2px;
+  box-shadow:0 0 7px -1px rgba(47,224,200,.8)}
+.gmode .chip{min-width:17px;height:17px;line-height:15px;font-size:9.5px;border-radius:4px}
+.ghint{padding:0 14px 10px;font-size:10.5px;font-weight:600;color:var(--dim);letter-spacing:.3px;
+  display:flex;align-items:center;gap:7px}
+.ghint i{font-style:normal;display:inline-block;width:34px;height:9px;border-radius:2px;
+  background:linear-gradient(90deg,rgba(47,224,200,.08),rgba(47,224,200,.85));
+  box-shadow:0 0 8px -2px rgba(47,224,200,.8)}
 .chips{display:flex;flex-wrap:wrap;gap:2px;margin-top:2px}
 .chip{display:inline-block;min-width:15px;height:15px;line-height:13px;padding:0 3px;border-radius:3px;
   font-size:8.5px;font-weight:700;text-align:center;background:var(--uc);color:#0a0d0f;
@@ -194,8 +205,9 @@ header{position:sticky;top:0;z-index:50;padding:0 0 0;border-bottom:1px solid va
     <div class="tube"></div>
     <div class="tabs" id="dayTabs"></div>
     <div class="views">
-      <button class="v on" data-v="grid">Horarios</button>
-      <button class="v" data-v="favs">Favoritos<span class="cnt" id="favCnt" style="display:none">0</span></button>
+      <button class="v on" data-v="grid">Mío<span class="cnt" id="favCnt" style="display:none">0</span></button>
+      <button class="v" data-v="group">Grupo</button>
+      <button class="v" data-v="favs">Lista</button>
       <button class="v" data-v="now">Ahora</button>
       <button class="filterbtn" id="filterBtn" onclick="openFilter()">Todos</button>
     </div>
@@ -769,6 +781,13 @@ function allSets(day){
   return out;
 }
 function myLevel(id){ return (marks[id]||{})[me] || null; }
+/* interes del grupo: imprescindible cuenta doble */
+function groupScore(id){
+  const m = marks[id] || {};
+  let people = 0, score = 0;
+  filter.forEach(n => { const l = m[n]; if (l) { people++; score += (l === "must" ? 2 : 1); } });
+  return { people, score, max: filter.length * 2 };
+}
 function visibleMarks(id){
   const m = marks[id] || {};
   return USERS.filter(u => m[u.n] && filter.includes(u.n)).map(u => ({...u, level:m[u.n]}));
@@ -846,7 +865,9 @@ function setDay(i){ dayIdx = i; render(); }
 function setView(v){
   view = v;
   document.querySelectorAll(".views button.v").forEach(b => b.classList.toggle("on", b.dataset.v===v));
-  ["grid","favs","now"].forEach(id => $("#"+id).style.display = (id===v) ? "block" : "none");
+  $("#grid").style.display = (v==="grid"||v==="group") ? "block" : "none";
+  $("#favs").style.display = (v==="favs") ? "block" : "none";
+  $("#now").style.display  = (v==="now")  ? "block" : "none";
   render();
 }
 document.querySelectorAll(".views button.v").forEach(b => b.onclick = () => setView(b.dataset.v));
@@ -854,7 +875,10 @@ document.querySelectorAll(".views button.v").forEach(b => b.onclick = () => setV
 function renderGrid(){
   const prevScroll = [...document.querySelectorAll("#grid .gridwrap")].map(el => el.scrollLeft);
   const day = DATA[dayIdx], clashes = myClashes(day), nm = nowMin(day);
-  let html = "";
+  const group = (view === "group");
+  let html = group
+    ? `<div class="ghint"><i></i>Cuanto más encendido, más gente lo quiere · tu marca lleva borde blanco</div>`
+    : "";
   day.sections.forEach(sec => {
     const slots = (sec.g1 - sec.g0)/15, cols = sec.stages.length;
     const colW = cols <= 3 ? "minmax(140px,1fr)" : "112px";
@@ -870,9 +894,21 @@ function renderGrid(){
         const id = setId(day.key, st.name, s);
         const lv = myLevel(id);
         const top = (s.a - sec.g0)/15, h = (s.b - s.a)/15;
-        const cls = ["set", lv||"", clashes.has(id)?"clash":"",
-          nm!=null && s.b<=nm ? "past":"", nm!=null && s.a<=nm && nm<s.b ? "nowplay":""].join(" ");
-        g += `<div class="${cls}" data-id="${esc(id)}" style="top:calc(var(--slot)*${top} + 2px);height:calc(var(--slot)*${h} - 5px);--sc:${stageColor(day,st.name)}"><span>${s.n}</span><span class="t">${fmt(s.a)}–${fmt(s.b)}</span>${chipsHtml(id)}</div>`;
+        const timing = (nm!=null && s.b<=nm ? "past" : "") + " " + (nm!=null && s.a<=nm && nm<s.b ? "nowplay" : "");
+        let cls, extra = "", badge = "";
+        if (group) {
+          const gs = groupScore(id);
+          const i = gs.max ? gs.score/gs.max : 0;
+          const showBadge = gs.people > 0 && h >= 2;
+          cls = ["set","gmode", gs.people?"":"g0", showBadge?"hascnt":"", timing].join(" ");
+          extra = `background:linear-gradient(170deg,rgba(47,224,200,${(i*.34).toFixed(3)}),rgba(47,224,200,${(i*.15).toFixed(3)}) 60%),linear-gradient(170deg,#1d2429,#141a1e);`
+                + `border-color:rgba(47,224,200,${(.05+i*.85).toFixed(3)});`
+                + `box-shadow:0 0 ${(i*15).toFixed(1)}px rgba(47,224,200,${(i*.45).toFixed(3)});`;
+          if (showBadge) badge = `<span class="cnt2">${gs.people}/${filter.length}</span>`;
+        } else {
+          cls = ["set", lv||"", clashes.has(id)?"clash":"", timing].join(" ");
+        }
+        g += `<div class="${cls}" data-id="${esc(id)}" style="top:calc(var(--slot)*${top} + 2px);height:calc(var(--slot)*${h} - 5px);--sc:${stageColor(day,st.name)};${extra}">${badge}<span>${s.n}</span><span class="t">${fmt(s.a)}–${fmt(s.b)}</span>${chipsHtml(id)}</div>`;
       });
       g += `</div>`;
     });
@@ -896,7 +932,7 @@ function renderFavs(){
   const items = allSets(day).filter(s => visibleMarks(s.id).length).sort((a,b) => a.a-b.a || a.stage.localeCompare(b.stage));
   updateCnt();
   if (!items.length){
-    $("#favs").innerHTML = `<div class="empty">Nadie ${filter.length===USERS.length?"":"(de los filtrados) "}ha marcado nada este día todavía.<br>Toca un set en HORARIOS: 1 toque = imprescindible, 2 = me apetece.</div>`;
+    $("#favs").innerHTML = `<div class="empty">Nadie ${filter.length===USERS.length?"":"(de los filtrados) "}ha marcado nada este día todavía.<br>Toca un set en MÍO: 1 toque = imprescindible, 2 = me apetece.</div>`;
     return;
   }
   let h = "";
@@ -967,7 +1003,7 @@ function cycle(id){
 
 function render(){
   renderTabs(); renderMe(); renderFilterBtn(); updateCnt();
-  if (view==="grid") renderGrid();
+  if (view==="grid" || view==="group") renderGrid();
   if (view==="favs") renderFavs();
   if (view==="now") renderNow();
 }
