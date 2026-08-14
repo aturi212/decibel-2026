@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0b0b12">
+<title>Decibel 2026 · Horarios</title>
+<style>
+:root{
+  --bg:#0b0b12; --bg2:#12121d; --card:#1a1a28; --card2:#202032;
+  --line:#2a2a40; --txt:#f2f2f8; --dim:#8d8da8;
+  --acc:#ffd400; --acc2:#00e5ff; --must:#22c55e; --like:#38bdf8; --clash:#ff4d4d;
+  --slot:24px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;overscroll-behavior-x:none}
+body{padding-bottom:env(safe-area-inset-bottom)}
+button{font-family:inherit}
+
+header{position:sticky;top:0;z-index:50;background:linear-gradient(180deg,#0b0b12 70%,rgba(11,11,18,.92));backdrop-filter:blur(8px);padding:10px 14px 0;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:baseline;gap:8px}
+.brand h1{font-size:20px;letter-spacing:3px;font-weight:800}
+.brand h1 b{color:var(--acc)}
+.brand span{font-size:11px;color:var(--dim);letter-spacing:1px}
+.mebtn{margin-left:auto;background:var(--card);border:1px solid var(--line);color:var(--txt);font-size:11px;font-weight:700;border-radius:14px;padding:4px 10px}
+.mebtn i{font-style:normal;display:inline-block;width:16px;height:16px;line-height:16px;border-radius:50%;text-align:center;font-size:9px;font-weight:800;color:#111;margin-right:4px;vertical-align:-3px}
+.tabs{display:flex;gap:6px;margin:10px 0}
+.tabs button{flex:1;background:var(--card);border:1px solid var(--line);color:var(--dim);border-radius:10px;padding:8px 4px;font-size:13px;font-weight:700;letter-spacing:.5px}
+.tabs button.on{background:var(--acc);border-color:var(--acc);color:#111}
+.views{display:flex;gap:12px;padding:2px 2px 8px;align-items:center}
+.views button.v{background:none;border:none;color:var(--dim);font-size:12px;font-weight:700;letter-spacing:1px;padding:4px 2px;border-bottom:2px solid transparent}
+.views button.v.on{color:var(--txt);border-color:var(--acc2)}
+.views .cnt{display:inline-block;min-width:16px;padding:0 4px;border-radius:8px;background:var(--must);color:#08130b;font-size:10px;margin-left:3px}
+.filterbtn{margin-left:auto;background:var(--card);border:1px solid var(--line);color:var(--txt);font-size:12px;border-radius:14px;padding:4px 10px;font-weight:700}
+.filterbtn.active{border-color:var(--acc2);color:var(--acc2)}
+
+#grid{padding:8px 0 30px}
+.section{margin:0 0 22px}
+.sec-title{padding:6px 14px;font-size:12px;font-weight:800;letter-spacing:2px;color:var(--acc2)}
+.gridwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.gtable{display:grid;position:relative}
+.timecol{position:sticky;left:0;z-index:20;background:var(--bg);border-right:1px solid var(--line)}
+.tlabel{height:calc(var(--slot)*4);font-size:10px;color:var(--dim);padding:2px 6px 0 10px;border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
+.stagehead{z-index:10;background:var(--bg2);font-size:10px;font-weight:800;letter-spacing:.5px;padding:7px 6px;text-align:center;border-left:1px solid var(--line);border-bottom:2px solid var(--sc,#555);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:sticky;top:0}
+.stagecol{position:relative;border-left:1px solid var(--line);background:
+  repeating-linear-gradient(180deg,transparent 0,transparent calc(var(--slot)*4 - 1px),var(--line) calc(var(--slot)*4 - 1px),var(--line) calc(var(--slot)*4))}
+.set{position:absolute;left:3px;right:3px;background:var(--card);border-radius:7px;border-left:3px solid var(--sc,#888);
+  padding:4px 5px;font-size:10.5px;line-height:1.25;overflow:hidden;display:flex;flex-direction:column;justify-content:center;gap:1px}
+.set .t{color:var(--dim);font-size:9px;font-variant-numeric:tabular-nums}
+.set.must{background:linear-gradient(135deg,#153420,#1c4429);border-left-color:var(--must);box-shadow:0 0 0 1px var(--must) inset}
+.set.like{background:linear-gradient(135deg,#122b3a,#173a4e);border-left-color:var(--like);box-shadow:0 0 0 1px var(--like) inset}
+.set.clash{box-shadow:0 0 0 1px var(--clash) inset}
+.set.past{opacity:.45}
+.set.nowplay{border-left-color:var(--acc)}
+.chips{display:flex;flex-wrap:wrap;gap:2px;margin-top:2px}
+.chip{display:inline-block;min-width:15px;height:15px;line-height:13px;padding:0 3px;border-radius:8px;font-size:8.5px;font-weight:800;text-align:center;background:var(--uc);color:#111;border:1px solid var(--uc)}
+.chip.like{background:transparent;color:var(--uc)}
+.chip.me{outline:1.5px solid #fff}
+
+.list{padding:10px 14px 40px;display:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;display:flex;gap:10px;align-items:center}
+.card .when{min-width:64px;text-align:center}
+.card .when b{display:block;font-size:14px;color:var(--acc);font-variant-numeric:tabular-nums}
+.card .when span{font-size:10px;color:var(--dim);font-variant-numeric:tabular-nums}
+.card .who{flex:1;min-width:0}
+.card .who b{display:block;font-size:13px;line-height:1.3}
+.card .who span.st{font-size:11px;color:var(--dim);letter-spacing:.5px}
+.card .chips{margin-top:5px;gap:3px}
+.card .chip{min-width:18px;height:18px;line-height:16px;font-size:10px;border-radius:9px}
+.card.clash{border-color:var(--clash)}
+.badge{display:inline-block;font-size:9px;font-weight:800;letter-spacing:1px;padding:2px 6px;border-radius:6px;margin-top:3px}
+.badge.clash{background:rgba(255,77,77,.15);color:var(--clash)}
+.badge.now{background:rgba(255,212,0,.15);color:var(--acc)}
+.badge.next{background:rgba(0,229,255,.12);color:var(--acc2)}
+.empty{color:var(--dim);text-align:center;padding:40px 20px;font-size:13px;line-height:1.6}
+.groupt{font-size:11px;font-weight:800;letter-spacing:2px;color:var(--acc2);margin:16px 2px 8px}
+.hint{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);color:var(--txt);font-size:12px;padding:8px 14px;border-radius:20px;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;z-index:99}
+.hint.show{opacity:1}
+.offline{position:fixed;top:0;left:0;right:0;background:#7a2020;color:#fff;font-size:11px;text-align:center;padding:3px;z-index:200;display:none}
+
+/* overlays */
+.overlay{position:fixed;inset:0;background:rgba(5,5,10,.8);backdrop-filter:blur(4px);z-index:100;display:none;align-items:flex-end;justify-content:center}
+.overlay.show{display:flex}
+.sheet{background:var(--bg2);border:1px solid var(--line);border-radius:18px 18px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));width:100%;max-width:480px}
+.sheet h2{font-size:15px;letter-spacing:1px;margin-bottom:4px}
+.sheet p{font-size:12px;color:var(--dim);margin-bottom:14px;line-height:1.5}
+.ugrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.ugrid button{background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:12px;padding:14px 4px;font-size:14px;font-weight:700}
+.ugrid button i{font-style:normal;display:block;width:28px;height:28px;line-height:28px;border-radius:50%;margin:0 auto 6px;font-size:12px;font-weight:800;color:#111;background:var(--uc)}
+.ugrid button.sel{border-color:var(--uc);box-shadow:0 0 0 1px var(--uc) inset}
+.frow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.frow button{background:var(--card);border:1px solid var(--line);color:var(--dim);border-radius:16px;padding:7px 14px;font-size:13px;font-weight:700}
+.frow button.sel{background:var(--uc,#333);border-color:var(--uc,#333);color:#111}
+.frow button.all.sel{background:var(--txt);border-color:var(--txt)}
+.sheet .close{width:100%;margin-top:4px;background:var(--acc);border:none;color:#111;font-weight:800;font-size:14px;border-radius:12px;padding:12px}
+.legendrow{display:flex;gap:14px;margin-bottom:14px;font-size:11px;color:var(--dim)}
+.legendrow b{color:var(--txt)}
+</style>
+</head>
+<body>
+<div class="offline" id="offline">Sin conexión — mostrando la última copia guardada</div>
+<header>
+  <div class="brand"><h1>DECI<b>BEL</b> 2026</h1><span>28–30 AGO</span>
+    <button class="mebtn" id="meBtn" onclick="openWho(true)"></button>
+  </div>
+  <div class="tabs" id="dayTabs"></div>
+  <div class="views">
+    <button class="v on" data-v="grid">HORARIOS</button>
+    <button class="v" data-v="favs">FAVORITOS<span class="cnt" id="favCnt" style="display:none">0</span></button>
+    <button class="v" data-v="now">AHORA</button>
+    <button class="filterbtn" id="filterBtn" onclick="openFilter()">👥 Todos</button>
+  </div>
+</header>
+<div id="grid"></div>
+<div id="favs" class="list"></div>
+<div id="now" class="list"></div>
+<div class="hint" id="hint"></div>
+
+<!-- quien eres -->
+<div class="overlay" id="whoOv">
+  <div class="sheet">
+    <h2>¿Quién eres?</h2>
+    <p>Se guarda en este móvil y no se te vuelve a preguntar. Tus marcas llevarán tu inicial.</p>
+    <div class="ugrid" id="whoGrid"></div>
+  </div>
+</div>
+
+<!-- filtro -->
+<div class="overlay" id="filterOv" onclick="if(event.target===this)closeFilter()">
+  <div class="sheet">
+    <h2>¿De quién quieres ver las marcas?</h2>
+    <div class="legendrow"><span><b>■ Relleno</b> = imprescindible</span><span><b>□ Borde</b> = me apetece</span></div>
+    <div class="frow" id="filterRow"></div>
+    <button class="close" onclick="closeFilter()">Listo</button>
+  </div>
+</div>
+
+<script>
+const DATA = [
+ {"key":"FRIDAY","title":"VIERNES 28 AGO","date":"2026-08-28","sections":[
+  {"name":"FRIDAY","g0":900,"g1":1500,"stages":[
+   {"name":"MAINSTAGE","sets":[
+    {"n":"Pat B & Ruthless pres. Freestyle Madness","a":900,"b":1020},
+    {"n":"Ecstatic pres. The Essence","a":1020,"b":1080},
+    {"n":"Sound Rush","a":1080,"b":1140},
+    {"n":"Adaro","a":1140,"b":1200},
+    {"n":"Warface","a":1200,"b":1260},
+    {"n":"Rooler","a":1260,"b":1320},
+    {"n":"Phuture Noize (LIVE)","a":1320,"b":1365},
+    {"n":"D-Block & S-te-Fan","a":1365,"b":1410},
+    {"n":"Dual Damage","a":1410,"b":1455},
+    {"n":"Paul Elstak & Dyen (Closing Session)","a":1455,"b":1500}
+   ]},
+   {"name":"HARDCORE/UPTEMPO","sets":[
+    {"n":"Hyperverb","a":900,"b":960},
+    {"n":"Namara & Sakyra","a":960,"b":1050},
+    {"n":"Unfused","a":1050,"b":1140},
+    {"n":"Mad Dog","a":1140,"b":1200},
+    {"n":"Angerfist: Journey","a":1200,"b":1290},
+    {"n":"Never Surrender pres. Rave & Plunder (LIVE)","a":1290,"b":1320},
+    {"n":"Partyraiser","a":1320,"b":1380},
+    {"n":"Gezellige Uptempo: Shit Happens (LIVE)","a":1380,"b":1410},
+    {"n":"Bombsquad","a":1410,"b":1470},
+    {"n":"Abaddon & MC Reckless pres. Pure Domination (LIVE)","a":1470,"b":1500}
+   ]},
+   {"name":"HARD TECHNO","sets":[
+    {"n":"Luka","a":900,"b":960},
+    {"n":"Devin Wild: Among The Noise","a":960,"b":1020},
+    {"n":"Cynthia Spiering","a":1020,"b":1080},
+    {"n":"Kruelty","a":1080,"b":1140},
+    {"n":"Rebekah","a":1140,"b":1230},
+    {"n":"Mad Dog: Downtempo","a":1230,"b":1290},
+    {"n":"Dikke Baap","a":1290,"b":1380},
+    {"n":"Ketting","a":1380,"b":1440}
+   ]},
+   {"name":"FUTURE DISTRICT","sets":[
+    {"n":"State of Deva","a":900,"b":945},
+    {"n":"Lady Tess","a":945,"b":990},
+    {"n":"Testarossa","a":990,"b":1035},
+    {"n":"Oblivion","a":1035,"b":1080},
+    {"n":"Emergence Showcase by NSIDE & New Signing","a":1080,"b":1125},
+    {"n":"Harde Kwark","a":1125,"b":1170},
+    {"n":"Dark Entities & Voidrage","a":1170,"b":1215},
+    {"n":"Dejection","a":1215,"b":1260},
+    {"n":"Dimma","a":1260,"b":1305},
+    {"n":"Kemal","a":1305,"b":1350},
+    {"n":"MT","a":1350,"b":1395},
+    {"n":"Missy","a":1395,"b":1440}
+   ]},
+   {"name":"NEW EARLY","sets":[
+    {"n":"Juno-B","a":900,"b":990},
+    {"n":"T-Go","a":990,"b":1080},
+    {"n":"Gabber Syndrome","a":1080,"b":1170},
+    {"n":"Exertion","a":1170,"b":1260},
+    {"n":"Noxa","a":1260,"b":1350},
+    {"n":"Ga-Osz","a":1350,"b":1440}
+   ]},
+   {"name":"SOUND OF DECIBEL","sets":[
+    {"n":"Pavo","a":900,"b":1020},
+    {"n":"Bass Modulators & Demi Kanon","a":1020,"b":1110},
+    {"n":"Psyko Punkz","a":1110,"b":1200},
+    {"n":"Brennan Heart","a":1200,"b":1275},
+    {"n":"Ran-D","a":1275,"b":1350},
+    {"n":"D-Sturb","a":1350,"b":1425},
+    {"n":"Unresolved","a":1425,"b":1500}
+   ]},
+   {"name":"RAW","sets":[
+    {"n":"Distress","a":900,"b":960},
+    {"n":"Repeller","a":960,"b":1020},
+    {"n":"Disaster","a":1020,"b":1065},
+    {"n":"Spitfire (LIVE)","a":1065,"b":1095},
+    {"n":"Sparkz","a":1095,"b":1140},
+    {"n":"Coldax","a":1140,"b":1185},
+    {"n":"Onyx (LIVE)","a":1185,"b":1215},
+    {"n":"The Smiler","a":1215,"b":1260},
+    {"n":"Unload & Incult","a":1260,"b":1305},
+    {"n":"Omnya","a":1305,"b":1350},
+    {"n":"Infliction","a":1350,"b":1395},
+    {"n":"Dark Entities (LIVE)","a":1395,"b":1425},
+    {"n":"EZG","a":1425,"b":1470}
+   ]}
+  ]},
+  {"name":"FRIDAY AFTER","g0":1500,"g1":1680,"stages":[
+   {"name":"CITY HALL","sets":[
+    {"n":"Element","a":1500,"b":1560},
+    {"n":"Radical Redemption","a":1560,"b":1620},
+    {"n":"Tha Playah: Journey","a":1620,"b":1680}
+   ]},
+   {"name":"RAVE CAFE","sets":[
+    {"n":"Ransom","a":1500,"b":1560},
+    {"n":"Genius","a":1560,"b":1620},
+    {"n":"Ricardo Moreno","a":1620,"b":1680}
+   ]}
+  ]}
+ ]},
+ {"key":"SATURDAY","title":"SABADO 29 AGO","date":"2026-08-29","sections":[
+  {"name":"SATURDAY PRE","g0":600,"g1":780,"stages":[
+   {"name":"BEACH CLUB","sets":[
+    {"n":"Neilio","a":600,"b":660},
+    {"n":"Jay Reeve","a":660,"b":720},
+    {"n":"Demi Kanon","a":720,"b":780}
+   ]},
+   {"name":"CITY HALL","sets":[
+    {"n":"Broodje","a":660,"b":720},
+    {"n":"Dirty Lil Monkeyz","a":720,"b":780}
+   ]},
+   {"name":"RAVE CAFE","sets":[
+    {"n":"Endurance & Intellectual","a":600,"b":660},
+    {"n":"Knoez & Mammoth Raw","a":660,"b":720},
+    {"n":"Oracle & Joe Gressive","a":720,"b":780}
+   ]}
+  ]},
+  {"name":"SATURDAY","g0":780,"g1":1500,"stages":[
+   {"name":"MAINSTAGE","sets":[
+    {"n":"Geck-o pres. Nature's Rhythm","a":780,"b":870},
+    {"n":"D-Charged & Serzo","a":870,"b":960},
+    {"n":"Galactixx","a":960,"b":1020},
+    {"n":"Frontliner pres. The Melodyman","a":1020,"b":1080},
+    {"n":"Noisecontrollers: 20 Years","a":1080,"b":1140},
+    {"n":"ICONS","a":1140,"b":1155},
+    {"n":"B-Front","a":1155,"b":1215},
+    {"n":"Vertile","a":1215,"b":1260},
+    {"n":"Brennan Heart","a":1260,"b":1320},
+    {"n":"Rebelion (LIVE)","a":1320,"b":1370},
+    {"n":"D-Sturb pres. Universe (LIVE)","a":1370,"b":1400},
+    {"n":"Gunz For Hire: 15 Years (LIVE)","a":1400,"b":1440},
+    {"n":"Neophyte & Panic (Closing Session)","a":1440,"b":1485},
+    {"n":"Saturday Endshow","a":1485,"b":1500}
+   ]},
+   {"name":"RAW","sets":[
+    {"n":"H4H Showcase: Udex & Rogue Zero & Deprived","a":780,"b":870},
+    {"n":"Big K (LIVE)","a":870,"b":900},
+    {"n":"Revolve & Cold Confusion pres. The Ancients (LIVE)","a":900,"b":930},
+    {"n":"Wolv (LIVE)","a":930,"b":960},
+    {"n":"E-Force","a":960,"b":1020},
+    {"n":"Sanctuary (LIVE)","a":1020,"b":1050},
+    {"n":"Cryex pres. Resurgence (LIVE)","a":1050,"b":1095},
+    {"n":"Regain & Nightcraft: Forsaken Two (LIVE)","a":1095,"b":1125},
+    {"n":"Act of Rage","a":1125,"b":1185},
+    {"n":"Coldax & Detailed: Marathon (LIVE)","a":1185,"b":1215},
+    {"n":"Damaxy","a":1215,"b":1260},
+    {"n":"Adjuzt","a":1260,"b":1305},
+    {"n":"The Straikerz","a":1305,"b":1365},
+    {"n":"Revelation (LIVE)","a":1365,"b":1410},
+    {"n":"Anderex","a":1410,"b":1455},
+    {"n":"Chapter V & Infliction (LIVE)","a":1455,"b":1500}
+   ]},
+   {"name":"HARDCORE","sets":[
+    {"n":"Invade","a":780,"b":870},
+    {"n":"Restrained","a":870,"b":960},
+    {"n":"Chaos Project pres. New Age of Rave","a":960,"b":1005},
+    {"n":"Korsakoff","a":1005,"b":1065},
+    {"n":"Gridkiller","a":1065,"b":1125},
+    {"n":"Tha Playah","a":1125,"b":1200},
+    {"n":"D-Fence","a":1200,"b":1260},
+    {"n":"Nosferatu","a":1260,"b":1335},
+    {"n":"Dither","a":1335,"b":1410},
+    {"n":"Cryogenic","a":1410,"b":1470}
+   ]},
+   {"name":"EUPHORIC","sets":[
+    {"n":"Davino","a":780,"b":840},
+    {"n":"Digital Madness","a":840,"b":900},
+    {"n":"Andy SVGE","a":900,"b":975},
+    {"n":"Primeshock","a":975,"b":1050},
+    {"n":"Solstice","a":1050,"b":1125},
+    {"n":"Adrenalize","a":1125,"b":1200},
+    {"n":"Jay Reeve","a":1200,"b":1275},
+    {"n":"The Pitcher","a":1275,"b":1350},
+    {"n":"Audiotricz","a":1350,"b":1425},
+    {"n":"More Kords pres. Zaagphoric","a":1425,"b":1470}
+   ]},
+   {"name":"INDUSTRIAL","sets":[
+    {"n":"Aliienmia","a":780,"b":870},
+    {"n":"Strange Arrival","a":870,"b":960},
+    {"n":"Mindustries","a":960,"b":1050},
+    {"n":"Khaoz Engine","a":1050,"b":1140},
+    {"n":"The Outside Agency","a":1140,"b":1230},
+    {"n":"Tripped & Starving Insect","a":1230,"b":1350},
+    {"n":"Trashmachine","a":1350,"b":1470}
+   ]},
+   {"name":"UPTEMPO","sets":[
+    {"n":"DMRC & Deviation","a":780,"b":840},
+    {"n":"Revellers, Bossels & Eraized","a":840,"b":900},
+    {"n":"Udow (LIVE)","a":900,"b":930},
+    {"n":"Juliex & The Dope Doctor","a":930,"b":990},
+    {"n":"Akimbo - Switching Sides (Decibel Special)","a":990,"b":1050},
+    {"n":"Amigo pres. Uptempo Fiesta (LIVE)","a":1050,"b":1080},
+    {"n":"Roosterz pres. Goosebumps (LIVE)","a":1080,"b":1110},
+    {"n":"Major Conspiracy","a":1110,"b":1170},
+    {"n":"T.M.O. (LIVE)","a":1170,"b":1200},
+    {"n":"Rosbeek","a":1200,"b":1245},
+    {"n":"Pinotello","a":1245,"b":1290},
+    {"n":"Unproven pres. Symbiosis (LIVE)","a":1290,"b":1320},
+    {"n":"Kili pres. Locked & Loaded (LIVE)","a":1320,"b":1350},
+    {"n":"Lunakorpz & Revealer","a":1350,"b":1410},
+    {"n":"99PRBLMZ (LIVE)","a":1410,"b":1440},
+    {"n":"Noxiouz","a":1440,"b":1500}
+   ]},
+   {"name":"HARDCORE CLASSICS","sets":[
+    {"n":"Stanton","a":780,"b":870},
+    {"n":"Uzi","a":870,"b":930},
+    {"n":"MD&A (LIVE)","a":930,"b":960},
+    {"n":"Painbringer","a":960,"b":1050},
+    {"n":"Scott Brown","a":1050,"b":1110},
+    {"n":"Ruffneck","a":1110,"b":1200},
+    {"n":"The Viper & G-Town Madness","a":1200,"b":1290},
+    {"n":"Catscan","a":1290,"b":1350},
+    {"n":"Vince","a":1350,"b":1410},
+    {"n":"Partyraiser","a":1410,"b":1470}
+   ]},
+   {"name":"PARTYSTYLE","sets":[
+    {"n":"Jixxx","a":780,"b":825},
+    {"n":"Onesie Brigade","a":825,"b":870},
+    {"n":"Elevation","a":870,"b":930},
+    {"n":"Coenfetti Classics","a":930,"b":975},
+    {"n":"Bassfeest","a":975,"b":1020},
+    {"n":"Mafklapperz","a":1020,"b":1065},
+    {"n":"Feestnation","a":1065,"b":1110},
+    {"n":"Otto Wunderbar","a":1110,"b":1140},
+    {"n":"Gladjakkers - Onmeunig Brekk'n","a":1140,"b":1170},
+    {"n":"Larstig & Gasdrop x Daani","a":1170,"b":1215},
+    {"n":"Larstig & Gasdrop x Andy SVGE","a":1215,"b":1260},
+    {"n":"Larstig & Gasdrop x A-Motion","a":1260,"b":1290},
+    {"n":"Larstig & Gasdrop x Roosterz","a":1290,"b":1320},
+    {"n":"Crazy Jack","a":1320,"b":1350},
+    {"n":"Worst Kaas Scenarion","a":1350,"b":1395},
+    {"n":"Buurman Branco","a":1395,"b":1440}
+   ]},
+   {"name":"HARDSTYLE CLASSICS","sets":[
+    {"n":"EMS & NSCLT","a":780,"b":870},
+    {"n":"Josh & Wesz","a":870,"b":945},
+    {"n":"Audiofreq","a":945,"b":1020},
+    {"n":"Deepack","a":1020,"b":1095},
+    {"n":"Zany","a":1095,"b":1170},
+    {"n":"Wasted Penguinz","a":1170,"b":1230},
+    {"n":"Jones","a":1230,"b":1290},
+    {"n":"Atmozfears","a":1290,"b":1350},
+    {"n":"Bass Chaserz: 15 Years Special","a":1350,"b":1410},
+    {"n":"Alpha Twins","a":1410,"b":1470}
+   ]},
+   {"name":"PUSSY LOUNGE","sets":[
+    {"n":"Potato (Lovely Launch)","a":780,"b":870},
+    {"n":"Pat B (Belgian Beats)","a":870,"b":930},
+    {"n":"Dr. Rude & Hans Glock (Freestyle Fanatics)","a":930,"b":1020},
+    {"n":"Coone (Hardstyle Hero)","a":1020,"b":1110},
+    {"n":"Outsiders & Darkraver (Double Trouble)","a":1110,"b":1200},
+    {"n":"Ruthless & LNY TNZ (Jumping Jacks)","a":1200,"b":1290},
+    {"n":"Paul Elstak ft. Boogshe (Hardcore Heavyweight)","a":1290,"b":1350},
+    {"n":"Endymion (Millennium Mayhem)","a":1350,"b":1440},
+    {"n":"Miss K8 (Freaky Finale)","a":1440,"b":1500}
+   ]},
+   {"name":"FUTURE DISTRICT","sets":[
+    {"n":"Resilience","a":780,"b":840},
+    {"n":"Savellix pres. The Summer of Melodies","a":840,"b":885},
+    {"n":"Ark8","a":885,"b":930},
+    {"n":"Erabreak","a":930,"b":975},
+    {"n":"Svane","a":975,"b":1020},
+    {"n":"Refold","a":1020,"b":1065},
+    {"n":"Miss Isa","a":1065,"b":1110},
+    {"n":"Dan Zero","a":1110,"b":1155},
+    {"n":"Dark Phoenix","a":1155,"b":1200},
+    {"n":"IJgenweis","a":1200,"b":1245},
+    {"n":"Bounster","a":1245,"b":1290},
+    {"n":"Conspirator","a":1290,"b":1335},
+    {"n":"Mistofz","a":1335,"b":1380},
+    {"n":"Guiberz & Silky Noize","a":1380,"b":1440}
+   ]},
+   {"name":"PARADES","sets":[
+    {"n":"Pussy Lounge Parade: Darkraver & Zany","a":990,"b":1035},
+    {"n":"Live Loud Parade: Ran-D","a":1230,"b":1275}
+   ]}
+  ]},
+  {"name":"SATURDAY AFTER","g0":1500,"g1":1680,"stages":[
+   {"name":"CITY HALL","sets":[
+    {"n":"Ecstatic vs Galactixx","a":1500,"b":1560},
+    {"n":"D-Sturb","a":1560,"b":1620},
+    {"n":"Soulblast pres. Uptempo Journey","a":1620,"b":1680}
+   ]},
+   {"name":"RAVE CAFE","sets":[
+    {"n":"Julia Rommy","a":1500,"b":1560},
+    {"n":"XRTN","a":1560,"b":1620},
+    {"n":"Rootz","a":1620,"b":1680}
+   ]}
+  ]}
+ ]},
+ {"key":"SUNDAY","title":"DOMINGO 30 AGO","date":"2026-08-30","sections":[
+  {"name":"SUNDAY PRE","g0":600,"g1":780,"stages":[
+   {"name":"BEACH CLUB","sets":[
+    {"n":"Consequent","a":600,"b":660},
+    {"n":"Artifact","a":660,"b":720},
+    {"n":"Digital Punk","a":720,"b":780}
+   ]},
+   {"name":"CITY HALL","sets":[
+    {"n":"Damaxy & Missy pres. Koffie Pauze","a":660,"b":720},
+    {"n":"Baklava Bangers by Kemal","a":720,"b":780}
+   ]},
+   {"name":"RAVE CAFE","sets":[
+    {"n":"Genetik","a":600,"b":660},
+    {"n":"Aestrobass","a":660,"b":720},
+    {"n":"Ducal","a":720,"b":780}
+   ]}
+  ]},
+  {"name":"SUNDAY","g0":765,"g1":1380,"stages":[
+   {"name":"MAINSTAGE","sets":[
+    {"n":"Zany & Max Enforcer pres. Sound Intense City","a":780,"b":870},
+    {"n":"Wildstylez","a":870,"b":930},
+    {"n":"Atmozfears (Sunday Marathon)","a":930,"b":960},
+    {"n":"Atmozfears & Devin Wild (Sunday Marathon)","a":960,"b":990},
+    {"n":"Devin Wild (Sunday Marathon)","a":990,"b":1020},
+    {"n":"Devin Wild & The Purge (Sunday Marathon)","a":1020,"b":1035},
+    {"n":"The Purge (Sunday Marathon)","a":1035,"b":1065},
+    {"n":"The Purge & The Saints (Sunday Marathon)","a":1065,"b":1080},
+    {"n":"The Saints (Sunday Marathon)","a":1080,"b":1110},
+    {"n":"Outsiders","a":1110,"b":1170},
+    {"n":"Ran-D pres. Resonance","a":1170,"b":1230},
+    {"n":"Sub Zero Project","a":1230,"b":1290},
+    {"n":"Radical Redemption: 15 Years (LIVE)","a":1290,"b":1320},
+    {"n":"Rejecta pres. Best of Live (Closing Session)","a":1320,"b":1365},
+    {"n":"Sunday Endshow","a":1365,"b":1380}
+   ]},
+   {"name":"RAW CLASSICS","sets":[
+    {"n":"Sub Sonik","a":780,"b":870},
+    {"n":"Degos & Re-Done pres. Transitions Are Key","a":870,"b":930},
+    {"n":"Adaro","a":930,"b":990},
+    {"n":"Chain Reaction & Luna pres. Classic Journey","a":990,"b":1080},
+    {"n":"B-Front","a":1080,"b":1140},
+    {"n":"E-Force vs Crypsis","a":1140,"b":1230},
+    {"n":"Regain","a":1230,"b":1290},
+    {"n":"Jason Payne & Deetox","a":1290,"b":1380}
+   ]},
+   {"name":"OLDSCHOOL","sets":[
+    {"n":"Gizmo","a":780,"b":870},
+    {"n":"DJ Yves","a":870,"b":960},
+    {"n":"Francois","a":960,"b":1050},
+    {"n":"Ruthless","a":1050,"b":1140},
+    {"n":"Darkraver","a":1140,"b":1230},
+    {"n":"Marc Acardipane","a":1230,"b":1290},
+    {"n":"DJ Rob & MC Joe","a":1290,"b":1380}
+   ]},
+   {"name":"TERROR","sets":[
+    {"n":"Hellcreator","a":780,"b":870},
+    {"n":"Recharge","a":870,"b":960},
+    {"n":"Bruhze","a":960,"b":1050},
+    {"n":"Akira","a":1050,"b":1140},
+    {"n":"Drokz","a":1140,"b":1230},
+    {"n":"Execrate","a":1230,"b":1305},
+    {"n":"SRB","a":1305,"b":1380}
+   ]},
+   {"name":"RAW","sets":[
+    {"n":"Cardination","a":780,"b":840},
+    {"n":"Vexxed (LIVE)","a":840,"b":870},
+    {"n":"Digital Punk & Level One","a":870,"b":930},
+    {"n":"Deluzion","a":930,"b":990},
+    {"n":"Aversion","a":990,"b":1050},
+    {"n":"Bloodlust","a":1050,"b":1110},
+    {"n":"Mish","a":1110,"b":1155},
+    {"n":"Mutilator","a":1155,"b":1200},
+    {"n":"Faceless & Vasto","a":1200,"b":1245},
+    {"n":"BMBERJCK","a":1245,"b":1290},
+    {"n":"Kruelty","a":1290,"b":1335},
+    {"n":"Classified Showcase: Detailed & Unique & Unmute","a":1335,"b":1380}
+   ]},
+   {"name":"MILLENNIUM HARDCORE","sets":[
+    {"n":"Kasparov","a":780,"b":870},
+    {"n":"J.D.A.","a":870,"b":930},
+    {"n":"Korsakoff","a":930,"b":990},
+    {"n":"Art of Fighters pres. New Millennium","a":990,"b":1050},
+    {"n":"Promo","a":1050,"b":1110},
+    {"n":"Panic","a":1110,"b":1200},
+    {"n":"Ophidian","a":1200,"b":1260},
+    {"n":"Mad Dog","a":1260,"b":1320},
+    {"n":"Distortion","a":1320,"b":1380}
+   ]},
+   {"name":"PARTYSTYLE","sets":[
+    {"n":"Decibel Got Talent","a":780,"b":840},
+    {"n":"Delftsche Helden","a":840,"b":885},
+    {"n":"Davino B2B DJ BRNT","a":885,"b":930},
+    {"n":"Matt Ardeo","a":930,"b":960},
+    {"n":"Loud & Fout pres. Loud, Oud & Goud","a":960,"b":1005},
+    {"n":"Ransom pres. Freestyle Rave","a":1005,"b":1050},
+    {"n":"Hannes Croell","a":1050,"b":1095},
+    {"n":"Hans Glock pres. Hans in the House (LIVE)","a":1095,"b":1230},
+    {"n":"Bernal Bounce","a":1230,"b":1275},
+    {"n":"Blurred Movement","a":1275,"b":1335},
+    {"n":"DJ Philemon","a":1335,"b":1380}
+   ]},
+   {"name":"HARDCORE BY BUD","sets":[
+    {"n":"Aftermath","a":780,"b":840},
+    {"n":"Karun pres. Mirage","a":840,"b":900},
+    {"n":"N-Vitral: Industrial Rave","a":900,"b":960},
+    {"n":"Hysta","a":960,"b":1020},
+    {"n":"The Viper pres. Return of the Rave","a":1020,"b":1080},
+    {"n":"Nosferatu & Tha Playah: Combined Forces","a":1080,"b":1140},
+    {"n":"Miss K8","a":1140,"b":1200},
+    {"n":"Anime","a":1200,"b":1260},
+    {"n":"Dr Donk","a":1260,"b":1320},
+    {"n":"F.Noize pres. Early Uptempo","a":1320,"b":1380}
+   ]},
+   {"name":"UPTEMPO","sets":[
+    {"n":"Double Trouble","a":780,"b":825},
+    {"n":"Josha","a":825,"b":870},
+    {"n":"Bulletproof: Journey","a":870,"b":915},
+    {"n":"Samynator (LIVE)","a":915,"b":945},
+    {"n":"Complex","a":945,"b":990},
+    {"n":"Barber","a":990,"b":1035},
+    {"n":"Satirized (Savage Marathon)","a":1035,"b":1080},
+    {"n":"Satirized & Lekkerfaces (Savage Marathon)","a":1080,"b":1095},
+    {"n":"Lekkerfaces (Savage Marathon)","a":1095,"b":1140},
+    {"n":"Lekkerfaces & Spitnoise (Savage Marathon)","a":1140,"b":1155},
+    {"n":"Spitnoise (Savage Marathon)","a":1155,"b":1200},
+    {"n":"Spitnoise & Manifest Destiny (Savage Marathon)","a":1200,"b":1215},
+    {"n":"Manifest Destiny (Savage Marathon)","a":1215,"b":1260},
+    {"n":"Dimitri K","a":1260,"b":1305},
+    {"n":"Krach Crew (Noiseflow, RWF, Vane, Schlot)","a":1305,"b":1350},
+    {"n":"Noiseflow vs Cyber Gunz","a":1350,"b":1380}
+   ]},
+   {"name":"FUTURE DISTRICT","sets":[
+    {"n":"TWSTD","a":780,"b":840},
+    {"n":"Alleviate & Rekall","a":840,"b":885},
+    {"n":"Jackro","a":885,"b":930},
+    {"n":"Beat Conductors","a":930,"b":975},
+    {"n":"Antergy","a":975,"b":1020},
+    {"n":"Essive","a":1020,"b":1065},
+    {"n":"Nocturnal","a":1065,"b":1110},
+    {"n":"B-Struct","a":1110,"b":1155},
+    {"n":"Xriminals","a":1155,"b":1200},
+    {"n":"Valhalla","a":1200,"b":1245},
+    {"n":"Dyzo","a":1245,"b":1290},
+    {"n":"Maintrex","a":1290,"b":1335},
+    {"n":"Tob-E & Undivided","a":1335,"b":1380}
+   ]},
+   {"name":"PARADES","sets":[
+    {"n":"Savage Parade: Complex","a":765,"b":825},
+    {"n":"Savage Parade: Gezellige Uptempo","a":1260,"b":1305}
+   ]}
+  ]},
+  {"name":"SUNDAY AFTER","g0":1380,"g1":1620,"stages":[
+   {"name":"CITY HALL","sets":[
+    {"n":"Nightcraft","a":1380,"b":1470},
+    {"n":"Gezellige Uptempo","a":1470,"b":1530},
+    {"n":"The Safari Trip: Tharoza vs Screecher vs Dark Individual","a":1530,"b":1620}
+   ]},
+   {"name":"RAVE CAFE","sets":[
+    {"n":"PLN-B","a":1380,"b":1440},
+    {"n":"Retrack","a":1440,"b":1500},
+    {"n":"Ekvalayzer B2B E-Volition pres. Dutch Hardbass","a":1500,"b":1560},
+    {"n":"Blyatsquad pres. Dutch Hardbass: Kickz & Donkz","a":1560,"b":1620}
+   ]}
+  ]}
+ ]}
+];
+const SB = "https://lqrzicuqzkqxsovdidmv.supabase.co";
+const KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxxcnppY3VxemtxeHNvdmRpZG12Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU5MjI5MTAsImV4cCI6MjEwMTQ5ODkxMH0.dAUFXs43ylZ_EcgAdqrFu9qpeJrkklWd5FpitbBMzcc";
+const TABLE = "decibel_favs";
+
+const USERS = [
+  {n:"Adri",  i:"A",  c:"#ffd400"},
+  {n:"Roma",  i:"Ro", c:"#00e5ff"},
+  {n:"Juan",  i:"J",  c:"#34d399"},
+  {n:"Diego", i:"D",  c:"#a78bfa"},
+  {n:"Raul",  i:"Ra", c:"#fb923c"},
+  {n:"Cule",  i:"C",  c:"#f472b6"},
+];
+const UC = Object.fromEntries(USERS.map(u=>[u.n,u]));
+
+/* ---------- estado ---------- */
+let me = null, marks = {}, filter = null, dayIdx = 0, view = "grid";
+try {
+  me = localStorage.getItem("db26_user");
+  filter = JSON.parse(localStorage.getItem("db26_filter") || "null");
+  marks = JSON.parse(localStorage.getItem("db26_marks") || "{}");
+} catch(e) {}
+if (!Array.isArray(filter)) filter = USERS.map(u=>u.n);
+const lsSet = (k,v) => { try { localStorage.setItem(k,v); } catch(e){} };
+
+const $ = s => document.querySelector(s);
+const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+const fmt = m => String(Math.floor(m/60)%24).padStart(2,"0")+":"+String(m%60).padStart(2,"0");
+const setId = (d,st,s) => d+"|"+st+"|"+s.a+"|"+s.n;
+const PALETTE = ["#ffd400","#00e5ff","#ff6b6b","#a78bfa","#34d399","#fb923c","#f472b6","#60a5fa","#facc15","#4ade80","#e879f9","#f87171","#38bdf8"];
+
+(function(){
+  const now = new Date();
+  for (let i=0;i<DATA.length;i++){
+    const d0 = new Date(DATA[i].date+"T06:00:00");
+    if (now>=d0 && now<new Date(d0.getTime()+864e5)) { dayIdx=i; return; }
+  }
+})();
+
+/* ---------- sync ---------- */
+const HDRS = { "apikey": KEY, "Authorization": "Bearer "+KEY, "Content-Type": "application/json" };
+let pullTimer = null;
+async function pull(){
+  try {
+    const r = await fetch(`${SB}/rest/v1/${TABLE}?select=user_name,set_id,level`, {headers: HDRS});
+    if (!r.ok) throw 0;
+    const rows = await r.json();
+    const nm = {};
+    rows.forEach(x => { (nm[x.set_id] = nm[x.set_id] || {})[x.user_name] = x.level; });
+    const ser = JSON.stringify(nm);
+    if (ser !== JSON.stringify(marks)) { marks = nm; lsSet("db26_marks", ser); render(); }
+    $("#offline").style.display = "none";
+  } catch(e) { $("#offline").style.display = "block"; }
+}
+async function push(id, level){
+  try {
+    let r;
+    if (level) {
+      r = await fetch(`${SB}/rest/v1/${TABLE}?on_conflict=user_name,set_id`, {
+        method: "POST",
+        headers: {...HDRS, "Prefer": "resolution=merge-duplicates"},
+        body: JSON.stringify({user_name: me, set_id: id, level})
+      });
+    } else {
+      r = await fetch(`${SB}/rest/v1/${TABLE}?user_name=eq.${encodeURIComponent(me)}&set_id=eq.${encodeURIComponent(id)}`, {
+        method: "DELETE", headers: HDRS
+      });
+    }
+    if (!r.ok) throw 0;
+    $("#offline").style.display = "none";
+  } catch(e) {
+    toast("⚠ No se pudo guardar — revisa la conexión");
+    pull();
+  }
+}
+function startPolling(){
+  clearInterval(pullTimer);
+  pull();
+  pullTimer = setInterval(pull, 20000);
+}
+document.addEventListener("visibilitychange", () => { if (!document.hidden) pull(); });
+
+/* ---------- helpers ---------- */
+function allSets(day){
+  const out = [];
+  day.sections.forEach(sec => sec.stages.forEach(st => st.sets.forEach(s => {
+    out.push({id:setId(day.key,st.name,s), stage:st.name, ...s});
+  })));
+  return out;
+}
+function myLevel(id){ return (marks[id]||{})[me] || null; }
+function visibleMarks(id){
+  const m = marks[id] || {};
+  return USERS.filter(u => m[u.n] && filter.includes(u.n)).map(u => ({...u, level:m[u.n]}));
+}
+function myClashes(day){
+  const f = allSets(day).filter(s => myLevel(s.id)==="must"), bad = new Set();
+  for (let i=0;i<f.length;i++) for (let j=i+1;j<f.length;j++)
+    if (f[i].a < f[j].b && f[j].a < f[i].b) { bad.add(f[i].id); bad.add(f[j].id); }
+  return bad;
+}
+function nowMin(day){
+  const diff = (Date.now() - new Date(day.date+"T00:00:00").getTime())/60000;
+  return (diff >= 0 && diff < 30*60) ? diff : null;
+}
+function stageColor(day, name){
+  const names = [...new Set(day.sections.flatMap(s => s.stages.map(x => x.name)))];
+  return PALETTE[names.indexOf(name) % PALETTE.length];
+}
+function chipsHtml(id, small){
+  const vs = visibleMarks(id);
+  if (!vs.length) return "";
+  return `<span class="chips">` + vs.map(v =>
+    `<span class="chip ${v.level==='like'?'like':''} ${v.n===me?'me':''}" style="--uc:${v.c}">${v.i}</span>`).join("") + `</span>`;
+}
+
+/* ---------- quien eres ---------- */
+function openWho(allowClose){
+  $("#whoGrid").innerHTML = USERS.map(u =>
+    `<button class="${u.n===me?'sel':''}" style="--uc:${u.c}" onclick="chooseWho('${u.n}')"><i>${u.i}</i>${u.n}</button>`).join("");
+  $("#whoOv").classList.add("show");
+}
+function chooseWho(n){
+  me = n; lsSet("db26_user", n);
+  $("#whoOv").classList.remove("show");
+  renderMe(); render();
+  toast(`Hola ${n} — tus marcas llevarán "${UC[n].i}"`);
+}
+function renderMe(){
+  const u = UC[me];
+  $("#meBtn").innerHTML = u ? `<i style="background:${u.c}">${u.i}</i>${u.n} ▾` : "¿Quién eres?";
+}
+
+/* ---------- filtro ---------- */
+function openFilter(){ renderFilterRow(); $("#filterOv").classList.add("show"); }
+function closeFilter(){ $("#filterOv").classList.remove("show"); }
+function renderFilterRow(){
+  const all = filter.length === USERS.length;
+  $("#filterRow").innerHTML =
+    `<button class="all ${all?'sel':''}" onclick="setFilterAll()">Todos</button>` +
+    USERS.map(u => `<button class="${filter.includes(u.n)?'sel':''}" style="--uc:${u.c}" onclick="toggleFilter('${u.n}')">${u.n}</button>`).join("");
+}
+function setFilterAll(){ filter = USERS.map(u=>u.n); saveFilter(); }
+function toggleFilter(n){
+  filter = filter.includes(n) ? filter.filter(x=>x!==n) : [...filter, n];
+  if (!filter.length) filter = [n];
+  saveFilter();
+}
+function saveFilter(){
+  lsSet("db26_filter", JSON.stringify(filter));
+  renderFilterRow(); renderFilterBtn(); render();
+}
+function renderFilterBtn(){
+  const all = filter.length === USERS.length;
+  const b = $("#filterBtn");
+  b.textContent = all ? "👥 Todos" : "👥 " + filter.map(n=>UC[n].i).join("·");
+  b.classList.toggle("active", !all);
+}
+
+/* ---------- render ---------- */
+function renderTabs(){
+  $("#dayTabs").innerHTML = DATA.map((d,i) =>
+    `<button class="${i===dayIdx?'on':''}" onclick="setDay(${i})">${d.title.split(" ")[0].replace("SABADO","SÁBADO")}<br><small>${d.title.split(" ").slice(1).join(" ")}</small></button>`).join("");
+}
+function setDay(i){ dayIdx = i; render(); }
+function setView(v){
+  view = v;
+  document.querySelectorAll(".views button.v").forEach(b => b.classList.toggle("on", b.dataset.v===v));
+  ["grid","favs","now"].forEach(id => $("#"+id).style.display = (id===v) ? "block" : "none");
+  render();
+}
+document.querySelectorAll(".views button.v").forEach(b => b.onclick = () => setView(b.dataset.v));
+
+function renderGrid(){
+  const prevScroll = [...document.querySelectorAll("#grid .gridwrap")].map(el => el.scrollLeft);
+  const day = DATA[dayIdx], clashes = myClashes(day), nm = nowMin(day);
+  let html = "";
+  day.sections.forEach(sec => {
+    const slots = (sec.g1 - sec.g0)/15, cols = sec.stages.length;
+    const colW = cols <= 3 ? "minmax(140px,1fr)" : "112px";
+    let g = `<div class="section"><div class="sec-title">${secLabel(sec.name)}</div><div class="gridwrap"><div class="gtable" style="grid-template-columns:52px repeat(${cols},${colW})">`;
+    g += `<div class="timecol" style="z-index:30;grid-row:1;grid-column:1"></div>`;
+    sec.stages.forEach((st,ci) => g += `<div class="stagehead" style="grid-row:1;grid-column:${ci+2};--sc:${stageColor(day,st.name)}">${st.name}</div>`);
+    g += `<div class="timecol" style="grid-row:2;grid-column:1">`;
+    for (let m=sec.g0; m<sec.g1; m+=60) g += `<div class="tlabel">${fmt(m)}</div>`;
+    g += `</div>`;
+    sec.stages.forEach((st,ci) => {
+      g += `<div class="stagecol" style="grid-row:2;grid-column:${ci+2};height:calc(var(--slot)*${slots})">`;
+      st.sets.forEach(s => {
+        const id = setId(day.key, st.name, s);
+        const lv = myLevel(id);
+        const top = (s.a - sec.g0)/15, h = (s.b - s.a)/15;
+        const cls = ["set", lv||"", clashes.has(id)?"clash":"",
+          nm!=null && s.b<=nm ? "past":"", nm!=null && s.a<=nm && nm<s.b ? "nowplay":""].join(" ");
+        g += `<div class="${cls}" data-id="${esc(id)}" style="top:calc(var(--slot)*${top} + 2px);height:calc(var(--slot)*${h} - 5px);--sc:${stageColor(day,st.name)}"><span>${s.n}</span><span class="t">${fmt(s.a)}–${fmt(s.b)}</span>${chipsHtml(id)}</div>`;
+      });
+      g += `</div>`;
+    });
+    g += `</div></div></div>`;
+    html += g;
+  });
+  $("#grid").innerHTML = html;
+  document.querySelectorAll("#grid .gridwrap").forEach((el,i) => { if (prevScroll[i]) el.scrollLeft = prevScroll[i]; });
+}
+$("#grid").addEventListener("click", e => {
+  const el = e.target.closest(".set");
+  if (el) cycle(el.dataset.id);
+});
+function secLabel(n){
+  return n.replace("FRIDAY","VIERNES").replace("SATURDAY","SÁBADO").replace("SUNDAY","DOMINGO")
+          .replace("PRE"," · PRE-PARTY").replace("AFTER"," · AFTER");
+}
+
+function renderFavs(){
+  const day = DATA[dayIdx], clashes = myClashes(day);
+  const items = allSets(day).filter(s => visibleMarks(s.id).length).sort((a,b) => a.a-b.a || a.stage.localeCompare(b.stage));
+  updateCnt();
+  if (!items.length){
+    $("#favs").innerHTML = `<div class="empty">Nadie ${filter.length===USERS.length?"":"(de los filtrados) "}ha marcado nada este día todavía.<br>Toca un set en HORARIOS: 1 toque = ★ imprescindible, 2 = ♥ me apetece.</div>`;
+    return;
+  }
+  let h = "";
+  items.forEach(s => {
+    const isClash = clashes.has(s.id);
+    h += `<div class="card ${isClash?'clash':''}">
+      <div class="when"><b>${fmt(s.a)}</b><span>${fmt(s.b)}</span></div>
+      <div class="who"><b>${s.n}</b><span class="st">${s.stage}</span>${chipsHtml(s.id)}${isClash?'<br><span class="badge clash">SOLAPE DE IMPRESCINDIBLES</span>':''}</div>
+    </div>`;
+  });
+  const nClash = [...clashes].length;
+  if (nClash) h = `<div class="empty" style="padding:6px 0 14px">⚠ Tienes ${nClash} imprescindibles que se solapan</div>` + h;
+  $("#favs").innerHTML = h;
+}
+
+function renderNow(){
+  const day = DATA[dayIdx], nm = nowMin(day);
+  if (nm == null){
+    $("#now").innerHTML = `<div class="empty">Esta vista cobra vida el ${day.title.toLowerCase()}.<br>Durante el festival verás qué suena ahora y qué viene después en cada stage.</div>`;
+    return;
+  }
+  let cur = "", nxt = "";
+  day.sections.forEach(sec => sec.stages.forEach(st => {
+    const playing = st.sets.find(s => s.a<=nm && nm<s.b);
+    const upcoming = st.sets.find(s => s.a>nm);
+    if (playing) cur += nowCard(playing, st.name, day, `<span class="badge now">SONANDO · quedan ${Math.ceil(playing.b-nm)} min</span>`);
+    if (upcoming) nxt += nowCard(upcoming, st.name, day, `<span class="badge next">EN ${Math.ceil(upcoming.a-nm)} MIN</span>`);
+  }));
+  $("#now").innerHTML =
+    (cur ? `<div class="groupt">▶ SONANDO AHORA</div>${cur}` : "") +
+    (nxt ? `<div class="groupt">⏭ SIGUIENTE POR STAGE</div>${nxt}` : "") ||
+    `<div class="empty">Nada programado ahora mismo.</div>`;
+}
+function nowCard(s, stage, day, badge){
+  const id = setId(day.key, stage, s);
+  return `<div class="card"><div class="when"><b>${fmt(s.a)}</b><span>${fmt(s.b)}</span></div>
+    <div class="who"><b>${s.n}</b><span class="st">${stage}</span><br>${badge}${chipsHtml(id)}</div></div>`;
+}
+
+function updateCnt(){
+  let n = 0;
+  Object.values(marks).forEach(m => { if (m[me]) n++; });
+  const el = $("#favCnt");
+  el.style.display = n ? "inline-block" : "none";
+  el.textContent = n;
+}
+
+let hintT;
+function toast(msg){
+  const h = $("#hint");
+  h.textContent = msg;
+  h.classList.add("show");
+  clearTimeout(hintT); hintT = setTimeout(() => h.classList.remove("show"), 1800);
+}
+function cycle(id){
+  if (!me) { openWho(); return; }
+  const cur = myLevel(id);
+  const next = cur == null ? "must" : cur === "must" ? "like" : null;
+  const m = marks[id] = marks[id] || {};
+  if (next) m[me] = next; else delete m[me];
+  lsSet("db26_marks", JSON.stringify(marks));
+  push(id, next);
+  const day = DATA[dayIdx];
+  toast(next==="must" ? (myClashes(day).has(id) ? "★ Imprescindible — ⚠ se solapa con otro" : "★ Imprescindible")
+      : next==="like" ? "♥ Me apetece" : "Marca quitada");
+  render();
+}
+
+function render(){
+  renderTabs(); renderMe(); renderFilterBtn(); updateCnt();
+  if (view==="grid") renderGrid();
+  if (view==="favs") renderFavs();
+  if (view==="now") renderNow();
+}
+setView("grid");
+if (!me) openWho();
+startPolling();
+setInterval(() => { if (view==="now") renderNow(); }, 30000);
+</script>
+</body>
+</html>
