@@ -854,6 +854,8 @@ function renderFilterBtn(){
   const b = $("#filterBtn");
   b.textContent = all ? "Todos" : filter.map(n=>UC[n].i).join("·");
   b.classList.toggle("active", !all);
+  /* el filtro solo aplica donde se ven marcas de otros */
+  b.style.display = (view === "grid") ? "none" : "";
 }
 
 /* ---------- render ---------- */
@@ -908,7 +910,9 @@ function renderGrid(){
         } else {
           cls = ["set", lv||"", clashes.has(id)?"clash":"", timing].join(" ");
         }
-        g += `<div class="${cls}" data-id="${esc(id)}" style="top:calc(var(--slot)*${top} + 2px);height:calc(var(--slot)*${h} - 5px);--sc:${stageColor(day,st.name)};${extra}">${badge}<span>${s.n}</span><span class="t">${fmt(s.a)}–${fmt(s.b)}</span>${chipsHtml(id)}</div>`;
+        /* en MIO solo se ve lo tuyo: sin iniciales de nadie */
+        const chips = group ? chipsHtml(id) : "";
+        g += `<div class="${cls}" data-id="${esc(id)}" style="top:calc(var(--slot)*${top} + 2px);height:calc(var(--slot)*${h} - 5px);--sc:${stageColor(day,st.name)};${extra}">${badge}<span>${s.n}</span><span class="t">${fmt(s.a)}–${fmt(s.b)}</span>${chips}</div>`;
       });
       g += `</div>`;
     });
