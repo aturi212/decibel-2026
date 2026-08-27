@@ -763,68 +763,96 @@ const KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZi
 const TABLE = "decibel_favs";
 const PTABLE = "decibel_plan";
 
-/* Esquema del recinto, calcado de los planos de Decibel 2025 (viernes /
-   sabado / savage). Coordenadas 0-100, x = oeste->este, y = sur->norte.
-   Cada dia el mismo hueco fisico cambia de nombre, por eso hay 3 mapas. */
-const SITE = { w: 700, h: 550, speed: 62 };   // metros y m/min andando
+/* Recinto 2026, calcado del plano oficial (decibel-map.vercel.app /
+   estilos Mapbox de officialb2s, 2026_FRIDAY/SATURDAY/SUNDAY).
+   Coordenadas 0-100, x = oeste->este, y = sur->norte. El festival es una
+   franja norte-sur en la orilla oeste del lago; City Hall (11) y Rave Cafe
+   (12) estan en el 24HRS District del camping, cruzando el lago por el sur;
+   Beach Club (13) es la playa de la orilla sur. */
+const SITE = { w: 750, h: 973, speed: 62 };   // metros y m/min andando
 
-/* huecos fisicos del recinto (2025) */
+/* posiciones oficiales; la clave S<n> es el numero del plano oficial */
 const SLOT = {
-  A:[10,54],   // borde oeste
-  B:[26,70],   // MAINSTAGE, al oeste pegado al lago
-  C:[24,48],   // justo debajo del mainstage
-  D:[16,24],   // esquina suroeste
-  E:[45,42],   // centro
-  E2:[45,58],  // centro-norte
-  F:[42,26],   // centro-sur
-  G:[62,54],   // centro-este
-  H:[64,32],   // centro-este sur
-  I:[80,48],   // este
-  J:[84,76],   // noreste
-  K:[44,64]    // entre centro y lago
+  S1: [36.5,80.9],
+  S2: [32.4,93.2],
+  S3: [16.9,87.5],
+  S4: [19.1,80.9],
+  S5: [22.6,60.0],
+  S6: [21.6,48.1],
+  S7: [23.2,35.4],
+  S8: [13.8,26.2],
+  S9: [34.9,20.3],
+  S10:[33.1,11.0],
+  S11:[80.4,28.9],
+  S12:[78.4,37.5],
+  S13:[66.2,12.1],
+  FD: [23.5,25.6]   // zona Future District (sab/dom)
 };
 const POS_DAY = {
   FRIDAY: {
-    "HARDCORE/UPTEMPO":SLOT.A, "MAINSTAGE":SLOT.B, "FUTURE DISTRICT":SLOT.C,
-    "HARD TECHNO":SLOT.D, "SOUND OF DECIBEL":SLOT.G, "NEW EARLY":SLOT.H,
-    "RAW":SLOT.I
+    "MAINSTAGE":SLOT.S1, "HARDCORE/UPTEMPO":SLOT.S2, "HARD TECHNO":SLOT.S3,
+    "FUTURE DISTRICT":SLOT.S4, "NEW EARLY":SLOT.S5, "SOUND OF DECIBEL":SLOT.S6,
+    "RAW":SLOT.S7
   },
   SATURDAY: {
-    "RAW":SLOT.A, "MAINSTAGE":SLOT.B, "EUPHORIC":SLOT.C, "HARDCORE":SLOT.D,
-    "UPTEMPO":SLOT.E, "INDUSTRIAL":SLOT.F, "HARDCORE CLASSICS":SLOT.G,
-    "PARTYSTYLE":SLOT.H, "HARDSTYLE CLASSICS":SLOT.I, "PUSSY LOUNGE":SLOT.J,
-    "FUTURE DISTRICT":SLOT.K
+    "MAINSTAGE":SLOT.S1, "RAW":SLOT.S2, "HARDCORE":SLOT.S3, "EUPHORIC":SLOT.S4,
+    "INDUSTRIAL":SLOT.S5, "UPTEMPO":SLOT.S6, "HARDCORE CLASSICS":SLOT.S7,
+    "PARTYSTYLE":SLOT.S8, "HARDSTYLE CLASSICS":SLOT.S9, "PUSSY LOUNGE":SLOT.S10,
+    "FUTURE DISTRICT":SLOT.FD
   },
   SUNDAY: {
-    "RAW":SLOT.A, "MAINSTAGE":SLOT.B, "OLDSCHOOL":SLOT.C, "PARTYSTYLE":SLOT.D,
-    "TERROR":SLOT.E, "RAW CLASSICS":SLOT.E2, "MILLENNIUM HARDCORE":SLOT.G,
-    "FUTURE DISTRICT":SLOT.H, "HARDCORE BY BUD":SLOT.I, "UPTEMPO":SLOT.J
+    "MAINSTAGE":SLOT.S1, "RAW CLASSICS":SLOT.S2, "OLDSCHOOL":SLOT.S4,
+    "TERROR":SLOT.S5, "RAW":SLOT.S6, "MILLENNIUM HARDCORE":SLOT.S7,
+    "PARTYSTYLE":SLOT.S8, "HARDCORE BY BUD":SLOT.S9, "UPTEMPO":SLOT.S10,
+    "FUTURE DISTRICT":SLOT.FD
   }
 };
-/* zonas que no cambian: entrada / ciudad / lago */
+/* fijos los tres dias (pre y afters) */
 const POS_FIX = {
-  "CITY HALL":[12,80], "RAVE CAFE":[27,86], "BEACH CLUB":[68,70]
+  "CITY HALL":SLOT.S11, "RAVE CAFE":SLOT.S12, "BEACH CLUB":SLOT.S13
 };
 function posMap(dayKey){ return Object.assign({}, POS_FIX, POS_DAY[dayKey] || {}); }
 
-/* fondo del recinto: lago al norte, boulevard en anillo y las dos entradas */
+/* zonas con nombre del plano oficial (solo decoracion) */
+const ZONES = {
+  "NEON FOREST":[10.8,74.0],
+  "FOOD DISTRICT":[29.7,65.3],
+  "CITY BEACH":[33.5,45.0],
+  "LEGACY FOUNTAINS":[10.5,33.0],
+  "SYNTH VALLEY":[17.0,14.0],
+  "24HRS DISTRICT":[84.0,23.0]
+};
+const ZONES_DAY = {
+  FRIDAY:   ["NEON FOREST","FOOD DISTRICT","LEGACY FOUNTAINS","24HRS DISTRICT"],
+  SATURDAY: ["NEON FOREST","FOOD DISTRICT","CITY BEACH","LEGACY FOUNTAINS","SYNTH VALLEY","24HRS DISTRICT"],
+  SUNDAY:   ["NEON FOREST","FOOD DISTRICT","CITY BEACH","LEGACY FOUNTAINS","SYNTH VALLEY","24HRS DISTRICT"]
+};
+
+/* fondo: lago en el centro, franja del festival al oeste, 24hrs al sureste */
 const TERRAIN = `
-  <rect x="0" y="0" width="700" height="550" fill="#0b1215"/>
-  <ellipse cx="400" cy="52" rx="138" ry="58" fill="#0e2a33" stroke="#1b4a58" stroke-width="2"/>
-  <text x="400" y="58" text-anchor="middle" font-size="17" font-weight="700" fill="#2b6a7c" letter-spacing="2">LAGO</text>
-  <path d="M100 240 L140 430 L330 420 L470 378 L580 300 L600 150 L430 118 L200 162 Z"
-        fill="none" stroke="#1c252a" stroke-width="30" stroke-linejoin="round"/>
-  <path d="M100 240 L140 430 L330 420 L470 378 L580 300 L600 150 L430 118 L200 162 Z"
-        fill="none" stroke="#2b383f" stroke-width="2" stroke-dasharray="6 9" stroke-linejoin="round"/>
+  <rect x="0" y="0" width="750" height="973" fill="#0b1215"/>
+  <path d="M354.9 60.8 L324.5 121.7 L349.8 192.7 L304.2 273.8 L283.9 344.8 L273.8 425.9 L289 501.9 L233.2 552.6 L248.4 628.7 L294.1 694.6 L309.3 775.7 L329.6 856.8 L365 912.6 L446.2 938 L588.1 932.9 L740.2 912.6 L740.2 35.5 L415.7 25.4 Z" fill="#0e2a33" stroke="#1b4a58" stroke-width="2"/>
+  <text x="486.7" y="456.3" text-anchor="middle" font-size="22" font-weight="700" fill="#2b6a7c" letter-spacing="4">LAGO</text>
+  <path d="M136.9 20.3 L415.7 25.4 L354.9 60.8 L324.5 121.7 L349.8 192.7 L304.2 273.8 L283.9 344.8 L273.8 425.9 L289 501.9 L233.2 552.6 L248.4 628.7 L294.1 694.6 L309.3 775.7 L283.9 872 L212.9 958.2 L131.8 981.6 L96.3 882.2 L86.2 730.1 L76 578 L71 425.9 L69 294.1 L76 182.5 L96.3 81.1 Z" fill="#161f1c" stroke="#2f3d36" stroke-width="2"/>
+  <path d="M527.3 790.9 L532.4 618.5 L578 547.6 L657.1 567.8 L707.8 664.2 L677.4 760.5 L588.1 826.4 Z" fill="#12303c" stroke="#1b4a58" stroke-width="2"/>
+  <path d="M547.6 679.4 L555.7 583 L588.1 555.7 L651 573.9 L689.5 659.1 L644.9 717.9 L576 717.9 Z" fill="#0d4152" stroke="#2b6a7c" stroke-width="1.5"/>
+  <path d="M461.4 872 L537.4 861.9 L555.7 902.5 L486.7 924.8 L451.2 902.5 Z" fill="#2a2b1e" stroke="#4a4630" stroke-width="1.5"/>
+  <path d="M182.5 45.6 L136.9 182.5 L124.7 324.5 L139.9 476.6 L131.8 608.4 L144 730.1 L187.6 851.8 L212.9 938" fill="none" stroke="#242f33" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M182.5 45.6 L136.9 182.5 L124.7 324.5 L139.9 476.6 L131.8 608.4 L144 730.1 L187.6 851.8 L212.9 938" fill="none" stroke="#3b4a50" stroke-width="1.5" stroke-dasharray="5 8"/>
   <g font-size="15" font-weight="700" fill="#6f8189" letter-spacing="1">
-    <circle cx="30" cy="26" r="7" fill="#3d4d55"/><text x="44" y="31">ENTRADA NORTE</text>
-    <circle cx="672" cy="470" r="7" fill="#3d4d55"/><text x="660" y="475" text-anchor="end">ENTRADA SUR</text>
+    <circle cx="354.9" cy="28.4" r="7" fill="#3d4d55"/><text x="368.9" y="33.4">ENTRADA NORTE</text>
+    <circle cx="150.1" cy="945.0" r="7" fill="#3d4d55"/><text x="164.1" y="950.0">ENTRADA SUR</text>
   </g>`;
+
+/* para ir del festival (oeste) al 24hrs/playa (este) se rodea el lago por
+   el sur: la distancia pasa por este punto en vez de cruzar el agua */
+const GATE = [44,9];
+function viaGate(p,q){ return (p[0]<50&&q[0]>58)||(p[0]>58&&q[0]<50); }
 function walkMin(a,b,P){
   const p=P[a], q=P[b];
   if(!p||!q) return null;
-  const dx=(p[0]-q[0])/100*SITE.w, dy=(p[1]-q[1])/100*SITE.h;
-  const d=Math.sqrt(dx*dx+dy*dy);
+  const dist=(u,v)=>{const dx=(u[0]-v[0])/100*SITE.w, dy=(u[1]-v[1])/100*SITE.h; return Math.sqrt(dx*dx+dy*dy);};
+  const d = viaGate(p,q) ? dist(p,GATE)+dist(GATE,q) : dist(p,q);
   if(d<5) return 0;
   return Math.max(2, Math.round(d/SITE.speed + 1));
 }
@@ -1161,7 +1189,7 @@ function planSets(day){
   return allSets(day).filter(s => plan[s.id]).sort((a,b) => a.a - b.a);
 }
 function wrapName(n){
-  const w = n.split(" "); const lines = []; let cur = "";
+  const w = n.replace(/\//g, "/\u200b ").split(" "); const lines = []; let cur = "";
   w.forEach(x => { if ((cur+" "+x).trim().length <= 11) cur = (cur+" "+x).trim(); else { if(cur) lines.push(cur); cur = x; } });
   if (cur) lines.push(cur);
   if (lines.length > 2) { lines.length = 2; lines[1] = lines[1].slice(0,10) + "…"; }
@@ -1175,12 +1203,20 @@ function renderMap(){
   const X = p => POS[p][0]/100*SITE.w, Y = p => (100-POS[p][1])/100*SITE.h;
 
   /* lineas del recorrido entre escenarios distintos */
+  const gx = GATE[0]/100*SITE.w, gy = (100-GATE[1])/100*SITE.h;
   let paths = "", labels = "";
   for (let i=0; i<route.length-1; i++){
     const a = route[i].stage, b = route[i+1].stage;
     if (a===b || !POS[a] || !POS[b]) continue;
-    paths += `<line x1="${X(a)}" y1="${Y(a)}" x2="${X(b)}" y2="${Y(b)}" stroke="#2fe0c8" stroke-width="4" stroke-dasharray="10 7" opacity=".85" marker-end="url(#ah)"/>`;
-    const mx=(X(a)+X(b))/2, my=(Y(a)+Y(b))/2, m=walkMin(a,b,POS);
+    const rodeo = viaGate(POS[a], POS[b]);
+    if (rodeo)
+      paths += `<polyline points="${X(a)},${Y(a)} ${gx},${gy} ${X(b)},${Y(b)}" fill="none" stroke="#2fe0c8" stroke-width="4" stroke-dasharray="10 7" opacity=".85" marker-end="url(#ah)"/>`;
+    else
+      paths += `<line x1="${X(a)}" y1="${Y(a)}" x2="${X(b)}" y2="${Y(b)}" stroke="#2fe0c8" stroke-width="4" stroke-dasharray="10 7" opacity=".85" marker-end="url(#ah)"/>`;
+    const legLen = Math.hypot(X(a)-X(b), Y(a)-Y(b));
+    const mx = rodeo ? gx : (X(a)+X(b))/2 + (legLen<90 ? 56 : 0),
+          my = rodeo ? gy-28 : (Y(a)+Y(b))/2 - 16,
+          m = walkMin(a,b,POS);
     labels += `<g><rect x="${mx-24}" y="${my-13}" width="48" height="26" rx="3" fill="#06110f" stroke="#2fe0c8" stroke-width="1.5"/>`
            + `<text x="${mx}" y="${my+7}" text-anchor="middle" font-size="19" font-weight="700" fill="#2fe0c8">${m} min</text></g>`;
   }
@@ -1190,18 +1226,29 @@ function renderMap(){
     const inRoute = route.some(s => s.stage === n);
     const c = stageColor(day, n);
     const r = n === "MAINSTAGE" ? 26 : 19;
+    const slotKey = Object.keys(SLOT).find(k => SLOT[k] === POS[n]);
+    const num = slotKey && slotKey[0] === "S" ? slotKey.slice(1) : "";
     nodes += `<g><circle cx="${X(n)}" cy="${Y(n)}" r="${r}" fill="${inRoute?c:'#151d21'}" stroke="${c}" stroke-width="${inRoute?4:2}" opacity="${inRoute?1:.75}"/>`;
+    if (num) nodes += `<text x="${X(n)}" y="${Y(n)+7}" text-anchor="middle" font-size="${n==="MAINSTAGE"?24:18}" font-weight="700" fill="${inRoute?'#04100e':c}" opacity="${inRoute?1:.85}">${num}</text>`;
     const ls = wrapName(n);
+    const crowded = stages.some(o => o!==n && Math.abs(POS[o][0]-POS[n][0])<12
+      && POS[n][1]-POS[o][1] > 3 && POS[n][1]-POS[o][1] < 9.5);
+    const y0 = crowded ? Y(n)-r-12-(ls.length-1)*20 : Y(n)+r+21;
     ls.forEach((t,i) => {
-      nodes += `<text x="${X(n)}" y="${Y(n)+r+21+i*20}" text-anchor="middle" font-size="19" font-weight="700"
+      nodes += `<text x="${X(n)}" y="${y0+i*20}" text-anchor="middle" font-size="19" font-weight="700"
         fill="${inRoute?'#eaf6f8':'#8fa3ab'}" stroke="#06090b" stroke-width="4" paint-order="stroke">${t}</text>`;
     });
     nodes += `</g>`;
   });
+  let zones = "";
+  (ZONES_DAY[day.key] || []).forEach(z => {
+    const p = ZONES[z]; if (!p) return;
+    zones += `<text x="${p[0]/100*SITE.w}" y="${(100-p[1])/100*SITE.h}" text-anchor="middle" font-size="13" font-weight="700" letter-spacing="1" fill="#ff2e88" stroke="#0b1215" stroke-width="3.5" paint-order="stroke">${z}</text>`;
+  });
   const svg = `<div class="mapwrap"><svg viewBox="0 0 ${SITE.w} ${SITE.h}" preserveAspectRatio="xMidYMid meet">
     <defs><marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
       <polygon points="0 0, 7 3.5, 0 7" fill="#2fe0c8"/></marker></defs>
-    ${TERRAIN}
+    ${TERRAIN}${zones}
     ${paths}${nodes}${labels}</svg></div>`;
 
   /* itinerario */
@@ -1230,7 +1277,7 @@ function renderMap(){
     list = `<div class="legrow">Recorrido de ${route.length} paradas · ${total} min andando en total</div>` + list;
   }
   $("#map").innerHTML = svg
-    + `<div class="legrow" style="margin:10px 0 12px">Esquema basado en los planos de Decibel 2025 · tiempos a pie aproximados.</div>`
+    + `<div class="legrow" style="margin:10px 0 12px">Plano oficial Decibel 2026 · el n\u00famero es el del plano · tiempos a pie aproximados (al 24HRS y la playa se rodea el lago).</div>`
     + list;
 }
 
